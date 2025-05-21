@@ -76,7 +76,7 @@ const Dashboard = () => {
 
   return (
     <div className="container mx-auto px-4 py-8">
-      <h1 className="text-3xl font-bold mb-6">Application Dashboard</h1>
+      <h1 className="text-3xl font-bold mb-6">Data Cleaning</h1>
       
       <div className="flex flex-col md:flex-row gap-4 mb-6">
         <div className="flex-1">
@@ -133,22 +133,21 @@ const Dashboard = () => {
                     <td className="px-6 py-4 whitespace-nowrap flex gap-2">
                       <Button
                         size="sm"
-                        className="bg-success hover:bg-success/90 transition-all shadow-sm flex items-center gap-1"
+                        className="bg-green-100 text-green-800 hover:bg-green-200 border border-green-200 shadow-sm flex items-center gap-1"
                         onClick={() => handleStatusChange(application.id, 'accepted')}
                       >
                         <Check className="h-4 w-4" /> Accept
                       </Button>
                       <Button
                         size="sm"
-                        variant="destructive"
-                        className="transition-all shadow-sm flex items-center gap-1"
+                        className="bg-red-100 text-red-800 hover:bg-red-200 border border-red-200 shadow-sm flex items-center gap-1"
                         onClick={() => handleStatusChange(application.id, 'rejected')}
                       >
                         <X className="h-4 w-4" /> Reject
                       </Button>
                       <Button
                         size="sm"
-                        className="bg-warning hover:bg-warning/90 transition-all shadow-sm flex items-center gap-1"
+                        className="bg-amber-100 text-amber-800 hover:bg-amber-200 border border-amber-200 shadow-sm flex items-center gap-1"
                         onClick={() => handleStatusChange(application.id, 'review')}
                       >
                         <Eye className="h-4 w-4" /> Review
@@ -185,15 +184,14 @@ const Dashboard = () => {
                       <td className="px-6 py-4 whitespace-nowrap flex gap-2">
                         <Button
                           size="sm"
-                          className="bg-success hover:bg-success/90 transition-all shadow-sm flex items-center gap-1"
+                          className="bg-green-100 text-green-800 hover:bg-green-200 border border-green-200 shadow-sm flex items-center gap-1"
                           onClick={() => handleStatusChange(application.id, 'accepted')}
                         >
                           <Check className="h-4 w-4" /> Accept
                         </Button>
                         <Button
                           size="sm"
-                          variant="destructive"
-                          className="transition-all shadow-sm flex items-center gap-1"
+                          className="bg-red-100 text-red-800 hover:bg-red-200 border border-red-200 shadow-sm flex items-center gap-1"
                           onClick={() => handleStatusChange(application.id, 'rejected')}
                         >
                           <X className="h-4 w-4" /> Reject
