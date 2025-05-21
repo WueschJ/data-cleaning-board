@@ -10,31 +10,31 @@ import {
   SelectValue 
 } from '@/components/ui/select';
 import { useToast } from '@/hooks/use-toast';
-
-// Mock data for user applications
-const initialApplications = [
-  { id: 1, name: 'John Doe', email: 'john@example.com', phone: '555-1234', status: 'pending', message: 'Interested in joining the app' },
-  { id: 2, name: 'Jane Smith', email: 'jane@example.com', phone: '555-5678', status: 'pending', message: 'Please let me join your platform' },
-  { id: 3, name: 'Mike Johnson', email: 'mike@example.com', phone: '555-9012', status: 'pending', message: 'Looking forward to testing the app' },
-  { id: 4, name: 'Sarah Williams', email: 'sarah@example.com', phone: '555-3456', status: 'pending', message: 'Heard great things about your platform' },
-  { id: 5, name: 'Dave Brown', email: 'dave@example.com', phone: '555-7890', status: 'pending', message: 'Hope to join your community soon' },
-  { id: 6, name: 'Emma Davis', email: 'emma@example.com', phone: '555-2345', status: 'pending', message: 'Excited to contribute to your app' },
-];
+import { Check, X, Eye } from "lucide-react";
+import { Badge } from "@/components/ui/badge";
 
 // Type definition for application
 type Application = {
   id: number;
   name: string;
   email: string;
-  phone: string;
   status: 'pending' | 'accepted' | 'rejected' | 'review';
-  message: string;
 };
+
+// Mock data for user applications with correct type
+const initialApplications: Application[] = [
+  { id: 1, name: 'John Doe', email: 'john@example.com', status: 'pending' },
+  { id: 2, name: 'Jane Smith', email: 'jane@example.com', status: 'pending' },
+  { id: 3, name: 'Mike Johnson', email: 'mike@example.com', status: 'pending' },
+  { id: 4, name: 'Sarah Williams', email: 'sarah@example.com', status: 'pending' },
+  { id: 5, name: 'Dave Brown', email: 'dave@example.com', status: 'pending' },
+  { id: 6, name: 'Emma Davis', email: 'emma@example.com', status: 'pending' },
+];
 
 const Dashboard = () => {
   const { toast } = useToast();
   const [applications, setApplications] = useState<Application[]>(initialApplications);
-  const [filter, setFilter] = useState<string>('all');
+  const [filter, setFilter] = useState<string>('pending');
   const [searchQuery, setSearchQuery] = useState<string>('');
 
   // Handle changing application status
@@ -48,7 +48,7 @@ const Dashboard = () => {
     if (app) {
       const message = {
         'accepted': `${app.name} has been accepted`,
-        'rejected': `${app.name} has been marked as junk`,
+        'rejected': `${app.name} has been rejected`,
         'review': `${app.name} has been marked for review`
       }[newStatus];
       
@@ -65,10 +65,9 @@ const Dashboard = () => {
     const matchesFilter = filter === 'all' || app.status === filter;
     const matchesSearch = 
       app.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      app.email.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      app.message.toLowerCase().includes(searchQuery.toLowerCase());
+      app.email.toLowerCase().includes(searchQuery.toLowerCase());
     
-    return matchesFilter && matchesSearch;
+    return matchesFilter && matchesSearch && app.status !== 'accepted' && app.status !== 'rejected';
   });
   
   // Get applications to be reviewed separately
@@ -82,7 +81,7 @@ const Dashboard = () => {
       <div className="flex flex-col md:flex-row gap-4 mb-6">
         <div className="flex-1">
           <Input
-            placeholder="Search by name, email or message..."
+            placeholder="Search by name or email..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             className="w-full"
@@ -96,8 +95,6 @@ const Dashboard = () => {
           <SelectContent>
             <SelectItem value="all">All Applications</SelectItem>
             <SelectItem value="pending">Pending</SelectItem>
-            <SelectItem value="accepted">Accepted</SelectItem>
-            <SelectItem value="rejected">Rejected</SelectItem>
           </SelectContent>
         </Select>
       </div>
@@ -109,8 +106,6 @@ const Dashboard = () => {
               <tr>
                 <th className="px-6 py-3 text-left font-medium text-gray-500 uppercase tracking-wider">Name</th>
                 <th className="px-6 py-3 text-left font-medium text-gray-500 uppercase tracking-wider">Email</th>
-                <th className="px-6 py-3 text-left font-medium text-gray-500 uppercase tracking-wider">Phone</th>
-                <th className="px-6 py-3 text-left font-medium text-gray-500 uppercase tracking-wider">Message</th>
                 <th className="px-6 py-3 text-left font-medium text-gray-500 uppercase tracking-wider">Status</th>
                 <th className="px-6 py-3 text-left font-medium text-gray-500 uppercase tracking-wider">Actions</th>
               </tr>
@@ -118,7 +113,7 @@ const Dashboard = () => {
             <tbody className="divide-y divide-gray-200">
               {pendingApplications.length === 0 ? (
                 <tr>
-                  <td colSpan={6} className="px-6 py-4 text-center text-gray-500">
+                  <td colSpan={4} className="px-6 py-4 text-center text-gray-500">
                     No applications found matching your criteria
                   </td>
                 </tr>
@@ -127,45 +122,37 @@ const Dashboard = () => {
                   <tr key={application.id} className="hover:bg-gray-50">
                     <td className="px-6 py-4 whitespace-nowrap">{application.name}</td>
                     <td className="px-6 py-4 whitespace-nowrap">{application.email}</td>
-                    <td className="px-6 py-4 whitespace-nowrap">{application.phone}</td>
-                    <td className="px-6 py-4 max-w-xs truncate">{application.message}</td>
                     <td className="px-6 py-4 whitespace-nowrap">
-                      <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full
-                        ${application.status === 'accepted' ? 'bg-green-100 text-green-800' : 
-                          application.status === 'rejected' ? 'bg-red-100 text-red-800' : 
-                          application.status === 'review' ? 'bg-yellow-100 text-yellow-800' : 
-                          'bg-blue-100 text-blue-800'}`}>
+                      <Badge className={`
+                        ${application.status === 'pending' ? 'bg-blue-100 text-blue-800' : ''}
+                        ${application.status === 'review' ? 'bg-yellow-100 text-yellow-800' : ''}
+                      `}>
                         {application.status.charAt(0).toUpperCase() + application.status.slice(1)}
-                      </span>
+                      </Badge>
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium flex space-x-2">
-                      {application.status !== 'accepted' && (
-                        <Button
-                          size="sm"
-                          className="bg-success hover:bg-success/90"
-                          onClick={() => handleStatusChange(application.id, 'accepted')}
-                        >
-                          Accept
-                        </Button>
-                      )}
-                      {application.status !== 'rejected' && (
-                        <Button
-                          size="sm"
-                          variant="destructive"
-                          onClick={() => handleStatusChange(application.id, 'rejected')}
-                        >
-                          Junk
-                        </Button>
-                      )}
-                      {application.status !== 'review' && (
-                        <Button
-                          size="sm"
-                          className="bg-warning hover:bg-warning/90"
-                          onClick={() => handleStatusChange(application.id, 'review')}
-                        >
-                          Review
-                        </Button>
-                      )}
+                    <td className="px-6 py-4 whitespace-nowrap flex gap-2">
+                      <Button
+                        size="sm"
+                        className="bg-success hover:bg-success/90 transition-all shadow-sm flex items-center gap-1"
+                        onClick={() => handleStatusChange(application.id, 'accepted')}
+                      >
+                        <Check className="h-4 w-4" /> Accept
+                      </Button>
+                      <Button
+                        size="sm"
+                        variant="destructive"
+                        className="transition-all shadow-sm flex items-center gap-1"
+                        onClick={() => handleStatusChange(application.id, 'rejected')}
+                      >
+                        <X className="h-4 w-4" /> Reject
+                      </Button>
+                      <Button
+                        size="sm"
+                        className="bg-warning hover:bg-warning/90 transition-all shadow-sm flex items-center gap-1"
+                        onClick={() => handleStatusChange(application.id, 'review')}
+                      >
+                        <Eye className="h-4 w-4" /> Review
+                      </Button>
                     </td>
                   </tr>
                 ))
@@ -187,8 +174,6 @@ const Dashboard = () => {
                   <tr>
                     <th className="px-6 py-3 text-left font-medium text-gray-500 uppercase tracking-wider">Name</th>
                     <th className="px-6 py-3 text-left font-medium text-gray-500 uppercase tracking-wider">Email</th>
-                    <th className="px-6 py-3 text-left font-medium text-gray-500 uppercase tracking-wider">Phone</th>
-                    <th className="px-6 py-3 text-left font-medium text-gray-500 uppercase tracking-wider">Message</th>
                     <th className="px-6 py-3 text-left font-medium text-gray-500 uppercase tracking-wider">Actions</th>
                   </tr>
                 </thead>
@@ -197,22 +182,21 @@ const Dashboard = () => {
                     <tr key={application.id} className="hover:bg-yellow-50">
                       <td className="px-6 py-4 whitespace-nowrap">{application.name}</td>
                       <td className="px-6 py-4 whitespace-nowrap">{application.email}</td>
-                      <td className="px-6 py-4 whitespace-nowrap">{application.phone}</td>
-                      <td className="px-6 py-4 max-w-xs truncate">{application.message}</td>
-                      <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium flex space-x-2">
+                      <td className="px-6 py-4 whitespace-nowrap flex gap-2">
                         <Button
                           size="sm"
-                          className="bg-success hover:bg-success/90"
+                          className="bg-success hover:bg-success/90 transition-all shadow-sm flex items-center gap-1"
                           onClick={() => handleStatusChange(application.id, 'accepted')}
                         >
-                          Accept
+                          <Check className="h-4 w-4" /> Accept
                         </Button>
                         <Button
                           size="sm"
                           variant="destructive"
+                          className="transition-all shadow-sm flex items-center gap-1"
                           onClick={() => handleStatusChange(application.id, 'rejected')}
                         >
-                          Junk
+                          <X className="h-4 w-4" /> Reject
                         </Button>
                       </td>
                     </tr>
